@@ -1,0 +1,7 @@
+# Expo
+
+expo-env.d.ts
+node_modules/
+.expo/
+.env
+.env.eas-preview

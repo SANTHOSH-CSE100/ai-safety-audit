@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: asa-ai-service
+spec:
+  replicas: 1  # scale carefully — GPU/CPU heavy
+  selector:
+    matchLabels: { app: asa-ai-service }
+  template:
+    metadata:
+      labels: { app: asa-ai-service }
+    spec:
+      containers:
+        - name: ai-service
+          image: ai-safety-audit-ai-service:latest
+          ports: [{ containerPort: 8000 }]
+          resources:
+            requests: { cpu: "1", memory: "2Gi" }
+            limits: { cpu: "4", memory: "8Gi" }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: asa-ai-service
+spec:
+  selector: { app: asa-ai-service }
+  ports:
+    - port: 8000
+      targetPort: 8000

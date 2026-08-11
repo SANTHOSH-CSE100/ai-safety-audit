@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: asa-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "500m"
+spec:
+  rules:
+    - host: api.ai-safety-audit.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: asa-backend
+                port: { number: 8080 }

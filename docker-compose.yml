@@ -1,0 +1,93 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: asa-postgres
+    environment:
+      POSTGRES_DB: ai_safety_audit
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: asa-redis
+    ports:
+      - "6379:6379"
+
+  minio:
+    image: minio/minio:latest
+    container_name: asa-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  ai-service:
+    build:
+      context: ./ai-service
+    container_name: asa-ai-service
+    environment:
+      AI_SERVICE_MINIO_ENDPOINT: minio:9000
+      AI_SERVICE_MINIO_ACCESS_KEY: minioadmin
+      AI_SERVICE_MINIO_SECRET_KEY: minioadmin
+    ports:
+      - "8000:8000"
+    depends_on:
+      - minio
+
+  backend:
+    build:
+      context: ./backend
+    container_name: asa-backend
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ai_safety_audit
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: ai-safety-audit
+      AI_SERVICE_URL: http://ai-service:8000
+      JWT_SECRET: change-this-in-production-to-a-long-random-secret
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      ai-service:
+        condition: service_started
+
+  nginx:
+    image: nginx:alpine
+    container_name: asa-nginx
+    volumes:
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  minio_data:
