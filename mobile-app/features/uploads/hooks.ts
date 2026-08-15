@@ -1,13 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getUpload, listUploads, uploadVideo } from "../../src/api/uploads";
 import { queryKeys } from "../../constants/queryKeys";
+import { useFactoryStore } from "../../src/store/factoryStore";
+import { getMockUploads } from "../../src/mock";
 
 export function useUploads(factoryId: string | null) {
+  const isMockMode = useFactoryStore((s) => s.isMockMode);
+
   return useQuery({
-    queryKey: queryKeys.uploads(factoryId ?? ""),
-    queryFn: () => listUploads(factoryId as string),
+    queryKey: [...queryKeys.uploads(factoryId ?? ""), isMockMode],
+    queryFn: () =>
+      isMockMode ? Promise.resolve(getMockUploads(factoryId as string)) : listUploads(factoryId as string),
     enabled: !!factoryId,
     refetchInterval: (query) => {
+      if (isMockMode) return false; // demo data is static — nothing to poll for
       // Keep polling as a backstop while anything is still processing —
       // the WebSocket hook gives instant updates, this covers reconnects.
       const hasActive = query.state.data?.some(

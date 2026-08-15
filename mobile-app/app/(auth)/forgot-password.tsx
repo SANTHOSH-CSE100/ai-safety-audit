@@ -9,7 +9,7 @@ import { ArrowLeft, Mail, MailCheck } from "lucide-react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
-import { colors } from "../../theme";
+import { colors, typography } from "../../theme";
 import { useForgotPassword } from "../../features/auth/hooks";
 
 const schema = z.object({
@@ -46,7 +46,7 @@ export default function ForgotPasswordScreen() {
             <View className="w-16 h-16 rounded-full bg-primary-50 items-center justify-center">
               <MailCheck size={28} color={colors.primary.DEFAULT} />
             </View>
-            <Text className="text-xl font-bold text-ink text-center">Check your email</Text>
+            <Text className={typography.screenTitle + " text-center"}>Check your email</Text>
             <Text className="text-sm text-muted text-center">
               If an account exists for that address, we've sent a link to reset your password.
             </Text>
@@ -55,8 +55,8 @@ export default function ForgotPasswordScreen() {
         ) : (
           <>
             <View className="gap-2">
-              <Text className="text-2xl font-bold text-ink">Forgot password?</Text>
-              <Text className="text-sm text-muted">
+              <Text className={typography.screenTitle}>Forgot password?</Text>
+              <Text className={typography.secondaryText}>
                 Enter the email linked to your account and we'll send you a reset link.
               </Text>
             </View>

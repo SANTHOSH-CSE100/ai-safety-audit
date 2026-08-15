@@ -12,7 +12,7 @@ import {
 } from "lucide-react-native";
 import { Avatar } from "../../../components/ui/Avatar";
 import { Card } from "../../../components/ui/Card";
-import { colors } from "../../../theme";
+import { colors, typography } from "../../../theme";
 import { useAuthStore } from "../../../src/store/authStore";
 import { useLogout } from "../../../features/auth/hooks";
 
@@ -48,8 +48,8 @@ export default function ProfileScreen() {
         <View className="items-center gap-3 pt-2">
           <Avatar name={fullName ?? "User"} size={72} />
           <View className="items-center">
-            <Text className="text-lg font-bold text-ink">{fullName}</Text>
-            <Text className="text-sm text-muted">{email}</Text>
+            <Text className={typography.sectionTitle}>{fullName}</Text>
+            <Text className={typography.secondaryText}>{email}</Text>
           </View>
           {role ? (
             <View className="bg-primary-50 rounded-pill px-3 py-1">
@@ -59,7 +59,7 @@ export default function ProfileScreen() {
         </View>
 
         <View className="px-5 gap-3">
-          <Text className="text-xs font-semibold text-muted uppercase">Settings</Text>
+          <Text className="text-xs font-semibold text-muted uppercase tracking-wide">Settings</Text>
           <Card padded={false}>
             <SettingsRow
               icon={<Bell size={17} color={colors.ink} />}
@@ -76,7 +76,7 @@ export default function ProfileScreen() {
         </View>
 
         <View className="px-5 gap-3">
-          <Text className="text-xs font-semibold text-muted uppercase">About</Text>
+          <Text className="text-xs font-semibold text-muted uppercase tracking-wide">About</Text>
           <Card padded={false}>
             <SettingsRow
               icon={<Info size={17} color={colors.ink} />}

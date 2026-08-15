@@ -7,8 +7,11 @@ import { Button } from "../../../components/ui/Button";
 import { ScoreRing } from "../../../components/ui/ScoreRing";
 import { SkeletonCard } from "../../../components/ui/Skeleton";
 import { ErrorState } from "../../../components/ui/ErrorState";
+import { StatRow } from "../../../components/ui/StatRow";
+import { SectionHeader } from "../../../components/ui/SectionHeader";
+import { DemoBadge } from "../../../components/ui/DemoBadge";
 import { ReportListItem } from "../../../features/reports/ReportListItem";
-import { colors } from "../../../theme";
+import { colors, typography } from "../../../theme";
 import { useFactories } from "../../../features/factories/hooks";
 import { useAnalytics } from "../../../features/analytics/hooks";
 import { useReports } from "../../../features/reports/hooks";
@@ -18,6 +21,7 @@ export default function FactoryDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: factories } = useFactories();
   const factory = factories?.find((f) => f.id === id);
+  const isMockMode = useFactoryStore((s) => s.isMockMode);
 
   const analyticsQuery = useAnalytics(id ?? null);
   const reportsQuery = useReports(id ?? null);
@@ -25,15 +29,16 @@ export default function FactoryDetailScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
-      <View className="flex-row items-center px-5 pt-3 pb-2">
+      <View className="flex-row items-center justify-between px-5 pt-3 pb-2">
         <Pressable onPress={() => router.back()} hitSlop={12} className="w-10 h-10 items-center justify-center -ml-2">
           <ArrowLeft size={22} color={colors.ink} />
         </Pressable>
+        {isMockMode ? <DemoBadge /> : null}
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 32, gap: 16 }} showsVerticalScrollIndicator={false}>
         <View className="px-5 gap-1">
-          <Text className="text-2xl font-bold text-ink">{factory?.name ?? "Factory"}</Text>
+          <Text className={typography.screenTitle}>{factory?.name ?? "Factory"}</Text>
           {factory?.location ? (
             <View className="flex-row items-center gap-1">
               <MapPin size={13} color={colors.muted} />
@@ -61,21 +66,23 @@ export default function FactoryDetailScreen() {
         </View>
 
         {analyticsQuery.isLoading ? (
-          <View className="px-5"><SkeletonCard /></View>
+          <View className="px-5">
+            <SkeletonCard />
+          </View>
         ) : analyticsQuery.data ? (
           <View className="px-5">
             <Card className="flex-row items-center gap-4">
               <ScoreRing score={analyticsQuery.data.avgSafetyScoreLast30Days} size={80} label="Safety" />
               <View className="flex-1 gap-2">
-                <Stat label="Violations (30d)" value={analyticsQuery.data.totalViolationsLast30Days} />
-                <Stat label="Uploads (30d)" value={analyticsQuery.data.totalUploadsLast30Days} />
+                <StatRow label="Violations (30d)" value={analyticsQuery.data.totalViolationsLast30Days} />
+                <StatRow label="Uploads (30d)" value={analyticsQuery.data.totalUploadsLast30Days} />
               </View>
             </Card>
           </View>
         ) : null}
 
         <View className="px-5 gap-3">
-          <Text className="text-base font-bold text-ink">Recent Reports</Text>
+          <SectionHeader title="Recent Reports" />
           {reportsQuery.isLoading ? (
             <SkeletonCard />
           ) : reportsQuery.isError ? (
@@ -87,19 +94,10 @@ export default function FactoryDetailScreen() {
               ))}
             </Card>
           ) : (
-            <Text className="text-sm text-muted">No reports yet for this factory.</Text>
+            <Text className={typography.secondaryText}>No reports yet for this factory.</Text>
           )}
         </View>
       </ScrollView>
     </SafeAreaView>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: number }) {
-  return (
-    <View className="flex-row items-center justify-between">
-      <Text className="text-sm text-muted">{label}</Text>
-      <Text className="text-base font-bold text-ink">{value}</Text>
-    </View>
   );
 }

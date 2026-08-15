@@ -10,7 +10,7 @@ import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import Toast from "react-native-toast-message";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
-import { colors } from "../../theme";
+import { colors, typography } from "../../theme";
 import { useLogin } from "../../features/auth/hooks";
 import { ApiError } from "../../src/api/client";
 
@@ -57,11 +57,16 @@ export default function LoginScreen() {
       >
         <View className="flex-1 px-6 justify-center gap-8">
           <Animated.View entering={FadeInDown.duration(500)} className="items-center gap-3">
-            <View className="w-16 h-16 rounded-2xl bg-primary items-center justify-center">
+            <View className="w-16 h-16 rounded-2xl bg-primary items-center justify-center" style={{ shadowColor: colors.primary[700], shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.25, shadowRadius: 16, elevation: 6 }}>
               <ShieldCheck size={30} color="#fff" />
             </View>
-            <Text className="text-2xl font-bold text-ink">AI Safety Audit</Text>
-            <Text className="text-sm text-muted text-center">
+            <View className="items-center gap-1">
+              <Text className={typography.screenTitle}>AI Safety Audit</Text>
+              <Text className="text-xs font-semibold tracking-wide text-primary uppercase">
+                Enterprise Safety Platform
+              </Text>
+            </View>
+            <Text className="text-sm text-muted text-center px-4">
               Sign in to view your factory's safety reports and analytics.
             </Text>
           </Animated.View>
@@ -126,9 +131,11 @@ export default function LoginScreen() {
             />
           </Animated.View>
 
-          <Text className="text-xs text-muted text-center">
-            Demo: admin@ai-safety-audit.dev / password123
-          </Text>
+          {__DEV__ ? (
+            <Text className="text-xs text-faint text-center">
+              Dev build — demo: admin@ai-safety-audit.dev / password123
+            </Text>
+          ) : null}
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

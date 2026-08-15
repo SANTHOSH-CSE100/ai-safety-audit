@@ -13,11 +13,11 @@ export function severityColor(severity: Severity): string {
 
 export function severityBg(severity: Severity): string {
   switch (severity) {
-    case "LOW": return "#EFF6FF";
-    case "MEDIUM": return "#FFFBEB";
-    case "HIGH": return "#FEF2F2";
-    case "CRITICAL": return "#FEE2E2";
-    default: return "#F3F4F6";
+    case "LOW": return colors.infoBg;
+    case "MEDIUM": return colors.warningBg;
+    case "HIGH": return colors.dangerBg;
+    case "CRITICAL": return colors.criticalBg;
+    default: return colors.mutedBg;
   }
 }
 

@@ -1,19 +1,24 @@
 import { useMemo, useState } from "react";
-import { FlatList, Pressable, Text, TextInput, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Pressable } from "react-native";
 import { router } from "expo-router";
-import { Search, MapPin, ChevronRight, Building2 } from "lucide-react-native";
+import { MapPin, ChevronRight, Building2 } from "lucide-react-native";
 import { AppHeader } from "../../../components/layout/AppHeader";
 import { Card } from "../../../components/ui/Card";
+import { SearchBar } from "../../../components/ui/SearchBar";
 import { SkeletonCard } from "../../../components/ui/Skeleton";
 import { ErrorState } from "../../../components/ui/ErrorState";
 import { EmptyState } from "../../../components/ui/EmptyState";
+import { DemoBadge } from "../../../components/ui/DemoBadge";
 import { colors } from "../../../theme";
 import { useFactories } from "../../../features/factories/hooks";
+import { useFactoryStore } from "../../../src/store/factoryStore";
 import type { FactoryResponse } from "../../../src/types/api";
 
 export default function FactoriesScreen() {
   const { data, isLoading, isError, refetch } = useFactories();
+  const isMockMode = useFactoryStore((s) => s.isMockMode);
   const [query, setQuery] = useState("");
 
   const filtered = useMemo(() => {
@@ -29,17 +34,9 @@ export default function FactoriesScreen() {
     <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
       <AppHeader title="Factories" subtitle={data ? `${data.length} total` : undefined} />
 
-      <View className="px-5 pb-3">
-        <View className="flex-row items-center gap-2 bg-surface border border-border rounded-2xl px-4 h-12">
-          <Search size={17} color={colors.muted} />
-          <TextInput
-            value={query}
-            onChangeText={setQuery}
-            placeholder="Search factories..."
-            placeholderTextColor={colors.muted}
-            className="flex-1 text-sm text-ink"
-          />
-        </View>
+      <View className="px-5 pb-3 gap-2.5">
+        <SearchBar value={query} onChangeText={setQuery} placeholder="Search factories..." />
+        {isMockMode ? <DemoBadge /> : null}
       </View>
 
       {isLoading ? (

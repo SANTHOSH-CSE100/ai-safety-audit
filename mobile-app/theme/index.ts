@@ -1,1 +1,2 @@
-export { colors, radii, shadow } from "../nativewind.config";
+export { colors, radii, shadow, spacing } from "../nativewind.config";
+export { typography } from "./typography";

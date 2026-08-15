@@ -36,7 +36,13 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/actuator/health",
-            "/ws/**"
+            "/ws/**",
+            // Native (non-SockJS) STOMP handshake used by the mobile app — see
+            // WebSocketConfig#/ws-native. The STOMP CONNECT frame carries its own
+            // Authorization header at the application layer, but the HTTP upgrade
+            // request that establishes the socket has no bearer token attached, so
+            // it must be allowed through here (mirrors the existing "/ws/**" entry).
+            "/ws-native/**"
     };
 
     @Bean
