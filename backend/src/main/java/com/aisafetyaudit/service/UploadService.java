@@ -4,12 +4,14 @@ import com.aisafetyaudit.dto.upload.UploadResponse;
 import com.aisafetyaudit.entity.Factory;
 import com.aisafetyaudit.entity.Upload;
 import com.aisafetyaudit.entity.User;
+import com.aisafetyaudit.event.UploadCreatedEvent;
 import com.aisafetyaudit.exception.ResourceNotFoundException;
 import com.aisafetyaudit.repository.FactoryRepository;
 import com.aisafetyaudit.repository.ReportRepository;
 import com.aisafetyaudit.repository.UploadRepository;
 import com.aisafetyaudit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,7 +28,7 @@ public class UploadService {
     private final FactoryRepository factoryRepository;
     private final ReportRepository reportRepository;
     private final StorageService storageService;
-    private final AiDetectionClient aiDetectionClient;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public UploadResponse createUpload(String userEmail, UUID factoryId, MultipartFile file) {
@@ -47,8 +49,12 @@ public class UploadService {
 
         upload = uploadRepository.save(upload);
 
-        // Kick off async AI processing — fire-and-forget, status updates via webhook/poll.
-        aiDetectionClient.submitForProcessing(upload.getId(), objectKey);
+        // AI processing (mock or real) starts once this transaction commits —
+        // see AiDetectionClient#onUploadCreated. Calling it directly here
+        // would race the commit: the @Async worker could start on another
+        // thread/connection before this INSERT is visible and fail to find
+        // the row it was just handed.
+        eventPublisher.publishEvent(new UploadCreatedEvent(upload.getId(), objectKey));
 
         return toResponse(upload);
     }

@@ -2,16 +2,11 @@ import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import Constants from "expo-constants";
-import {
-  ArrowLeft,
-  LogOut,
-  Bell,
-  Shield,
-  ChevronRight,
-  Info,
-} from "lucide-react-native";
+import { LogOut, Bell, Shield, ChevronRight, Info } from "lucide-react-native";
 import { Avatar } from "../../../components/ui/Avatar";
 import { Card } from "../../../components/ui/Card";
+import { Button } from "../../../components/ui/Button";
+import { DetailHeader } from "../../../components/layout/DetailHeader";
 import { colors, typography } from "../../../theme";
 import { useAuthStore } from "../../../src/store/authStore";
 import { useLogout } from "../../../features/auth/hooks";
@@ -37,12 +32,7 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
-      <View className="flex-row items-center px-5 pt-3 pb-2">
-        <Pressable onPress={() => router.back()} hitSlop={12} className="w-10 h-10 items-center justify-center -ml-2">
-          <ArrowLeft size={22} color={colors.ink} />
-        </Pressable>
-        <Text className="text-lg font-bold text-ink ml-1">Profile</Text>
-      </View>
+      <DetailHeader title="Profile" />
 
       <ScrollView contentContainerStyle={{ paddingBottom: 40, gap: 20 }} showsVerticalScrollIndicator={false}>
         <View className="items-center gap-3 pt-2">
@@ -60,7 +50,7 @@ export default function ProfileScreen() {
 
         <View className="px-5 gap-3">
           <Text className="text-xs font-semibold text-muted uppercase tracking-wide">Settings</Text>
-          <Card padded={false}>
+          <Card padded={false} elevation="flat">
             <SettingsRow
               icon={<Bell size={17} color={colors.ink} />}
               label="Notifications"
@@ -77,7 +67,7 @@ export default function ProfileScreen() {
 
         <View className="px-5 gap-3">
           <Text className="text-xs font-semibold text-muted uppercase tracking-wide">About</Text>
-          <Card padded={false}>
+          <Card padded={false} elevation="flat">
             <SettingsRow
               icon={<Info size={17} color={colors.ink} />}
               label="App Version"
@@ -88,13 +78,13 @@ export default function ProfileScreen() {
         </View>
 
         <View className="px-5">
-          <Pressable
+          <Button
+            label="Sign Out"
+            variant="danger"
+            icon={<LogOut size={17} color="#fff" />}
             onPress={handleLogout}
-            className="flex-row items-center justify-center gap-2 bg-red-50 rounded-2xl py-3.5"
-          >
-            <LogOut size={17} color={colors.danger} />
-            <Text className="text-sm font-semibold text-danger">Sign Out</Text>
-          </Pressable>
+            fullWidth
+          />
         </View>
       </ScrollView>
     </SafeAreaView>

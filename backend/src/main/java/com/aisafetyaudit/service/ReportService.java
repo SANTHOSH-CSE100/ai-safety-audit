@@ -24,9 +24,11 @@ public class ReportService {
         Report report = Report.builder()
                 .upload(upload)
                 .factory(upload.getFactory())
+                .title(result.title())
                 .riskScore(result.riskScore())
                 .safetyScore(result.safetyScore())
                 .summaryJson(result.summary())
+                .recommendations(result.recommendations())
                 .build();
 
         final Report savedReport = reportRepository.save(report);

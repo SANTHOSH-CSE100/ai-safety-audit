@@ -28,9 +28,14 @@ export function ReportListItem({
       </View>
 
       <View className="flex-1">
+        {report.title ? (
+          <Text className="text-sm font-medium text-ink" numberOfLines={1}>
+            {report.title}
+          </Text>
+        ) : null}
         <View className="flex-row items-center gap-1.5">
           <ShieldAlert size={13} color={colors.muted} />
-          <Text className="text-sm font-medium text-ink">
+          <Text className={report.title ? "text-xs text-muted" : "text-sm font-medium text-ink"}>
             {report.violations.length} violation{report.violations.length === 1 ? "" : "s"}
           </Text>
         </View>

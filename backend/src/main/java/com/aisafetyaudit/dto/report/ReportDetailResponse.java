@@ -8,10 +8,12 @@ import java.util.UUID;
 public record ReportDetailResponse(
         UUID id,
         UUID uploadId,
+        String title,
         int riskScore,
         int safetyScore,
         Map<String, Integer> summary,
         List<ViolationResponse> violations,
+        List<String> recommendations,
         Instant createdAt
 ) {
     public record ViolationResponse(

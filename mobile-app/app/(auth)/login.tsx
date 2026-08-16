@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Text, View, KeyboardAvoidingView, Platform, Pressable } from "react-native";
+import { Text, View, KeyboardAvoidingView, Platform, Pressable, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
@@ -55,7 +55,11 @@ export default function LoginScreen() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
       >
-        <View className="flex-1 px-6 justify-center gap-8">
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24, justifyContent: "center", gap: 32, paddingVertical: 24 }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
           <Animated.View entering={FadeInDown.duration(500)} className="items-center gap-3">
             <View className="w-16 h-16 rounded-2xl bg-primary items-center justify-center" style={{ shadowColor: colors.primary[700], shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.25, shadowRadius: 16, elevation: 6 }}>
               <ShieldCheck size={30} color="#fff" />
@@ -136,7 +140,7 @@ export default function LoginScreen() {
               Dev build — demo: admin@ai-safety-audit.dev / password123
             </Text>
           ) : null}
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

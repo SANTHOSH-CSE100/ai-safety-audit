@@ -1,4 +1,4 @@
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useQueries } from "@tanstack/react-query";
 import { useState } from "react";
@@ -26,6 +26,13 @@ export default function AnalyticsScreen() {
   const { factories, selected, isMockMode } = useFactoryStore();
   const [days, setDays] = useState(30);
   const analyticsQuery = useAnalytics(selected?.id ?? null, days);
+  const { width: screenWidth } = useWindowDimensions();
+
+  // Three metric cards side by side get cramped below ~380dp — reflow to a
+  // 2-column (2 + 1) layout there instead of forcing three narrow cards.
+  const METRIC_GAP = 12; // gap-3
+  const metricColumns = screenWidth < 380 ? 2 : 3;
+  const metricItemWidth = (screenWidth - 40 - METRIC_GAP * (metricColumns - 1)) / metricColumns;
 
   // Factory comparison — only meaningful with more than one factory.
   const comparisonQueries = useQueries({
@@ -46,7 +53,7 @@ export default function AnalyticsScreen() {
     <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
       <AppHeader title="Analytics" subtitle={`Last ${days} days`} />
       <FactorySelector />
-      <View className="mb-3">
+      <View className="mt-1 mb-4">
         <DateRangeFilter days={days} onChange={setDays} />
       </View>
 
@@ -61,20 +68,26 @@ export default function AnalyticsScreen() {
         <ErrorState message="Couldn't load analytics." onRetry={() => analyticsQuery.refetch()} />
       ) : analyticsQuery.data ? (
         <ScrollView contentContainerStyle={{ paddingBottom: 40, gap: 20 }} showsVerticalScrollIndicator={false}>
-          <View className="px-5 flex-row gap-3">
-            <MetricCard
-              icon={ShieldAlert}
-              label="Violations"
-              value={analyticsQuery.data.totalViolationsLast30Days}
-              tone={analyticsQuery.data.totalViolationsLast30Days > 0 ? "danger" : "success"}
-            />
-            <MetricCard icon={UploadIcon} label="Uploads" value={analyticsQuery.data.totalUploadsLast30Days} tone="primary" />
-            <MetricCard
-              icon={BarChart3}
-              label="Avg Safety"
-              value={analyticsQuery.data.avgSafetyScoreLast30Days}
-              tone={analyticsQuery.data.avgSafetyScoreLast30Days >= 75 ? "success" : "warning"}
-            />
+          <View className="px-5 flex-row flex-wrap gap-3">
+            <View style={{ width: metricItemWidth }}>
+              <MetricCard
+                icon={ShieldAlert}
+                label="Violations"
+                value={analyticsQuery.data.totalViolationsLast30Days}
+                tone={analyticsQuery.data.totalViolationsLast30Days > 0 ? "danger" : "success"}
+              />
+            </View>
+            <View style={{ width: metricItemWidth }}>
+              <MetricCard icon={UploadIcon} label="Uploads" value={analyticsQuery.data.totalUploadsLast30Days} tone="primary" />
+            </View>
+            <View style={{ width: metricItemWidth }}>
+              <MetricCard
+                icon={BarChart3}
+                label="Avg Safety"
+                value={analyticsQuery.data.avgSafetyScoreLast30Days}
+                tone={analyticsQuery.data.avgSafetyScoreLast30Days >= 75 ? "success" : "warning"}
+              />
+            </View>
           </View>
 
           <View className="px-5">

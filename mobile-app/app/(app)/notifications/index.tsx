@@ -1,14 +1,14 @@
-import { FlatList, RefreshControl, Text, View, Pressable } from "react-native";
+import { FlatList, RefreshControl, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useState } from "react";
-import { ArrowLeft, Bell } from "lucide-react-native";
+import { Bell } from "lucide-react-native";
 import { ErrorState } from "../../../components/ui/ErrorState";
 import { EmptyState } from "../../../components/ui/EmptyState";
 import { SkeletonCard } from "../../../components/ui/Skeleton";
 import { NotificationCard } from "../../../components/ui/NotificationCard";
 import { DemoBadge } from "../../../components/ui/DemoBadge";
-import { colors } from "../../../theme";
+import { DetailHeader } from "../../../components/layout/DetailHeader";
 import { isMockId } from "../../../src/mock";
 import { useMarkRead, useNotifications } from "../../../features/notifications/hooks";
 
@@ -26,15 +26,7 @@ export default function NotificationsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
-      <View className="flex-row items-center justify-between px-5 pt-3 pb-2">
-        <View className="flex-row items-center">
-          <Pressable onPress={() => router.back()} hitSlop={12} className="w-10 h-10 items-center justify-center -ml-2">
-            <ArrowLeft size={22} color={colors.ink} />
-          </Pressable>
-          <Text className="text-lg font-bold text-ink ml-1">Notifications</Text>
-        </View>
-        {isDemo ? <DemoBadge /> : null}
-      </View>
+      <DetailHeader title="Notifications" right={isDemo ? <DemoBadge /> : undefined} />
 
       {isLoading ? (
         <View className="px-5 gap-3">
@@ -49,7 +41,7 @@ export default function NotificationsScreen() {
         <FlatList
           data={data}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 24 }}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 32 }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           renderItem={({ item }) => (
             <NotificationCard

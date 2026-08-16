@@ -35,7 +35,9 @@ public class PdfReportService {
             PdfWriter.getInstance(document, out);
             document.open();
 
-            document.add(new Paragraph("AI Safety Audit — Safety Report", TITLE_FONT));
+            document.add(new Paragraph(
+                    report.title() != null && !report.title().isBlank() ? report.title() : "AI Safety Audit — Safety Report",
+                    TITLE_FONT));
             document.add(new Paragraph(
                     "Generated: " + DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm 'UTC'")
                             .withZone(ZoneOffset.UTC).format(report.createdAt()),
@@ -49,6 +51,9 @@ public class PdfReportService {
             document.add(Chunk.NEWLINE);
 
             addViolationTable(document, report);
+            document.add(Chunk.NEWLINE);
+
+            addRecommendations(document, report);
 
         } catch (DocumentException e) {
             throw new RuntimeException("Failed to generate PDF report", e);
@@ -111,6 +116,18 @@ public class PdfReportService {
         }
 
         document.add(table);
+    }
+
+    private void addRecommendations(Document document, ReportDetailResponse report) throws DocumentException {
+        if (report.recommendations() == null || report.recommendations().isEmpty()) return;
+
+        document.add(new Paragraph("Recommendations", HEADING_FONT));
+        com.lowagie.text.List list = new com.lowagie.text.List(com.lowagie.text.List.UNORDERED);
+        list.setIndentationLeft(18);
+        for (String recommendation : report.recommendations()) {
+            list.add(new com.lowagie.text.ListItem(recommendation, BODY_FONT));
+        }
+        document.add(list);
     }
 
     private PdfPCell cellOf(String text) {

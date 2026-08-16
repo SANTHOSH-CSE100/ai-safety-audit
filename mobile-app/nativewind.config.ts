@@ -71,6 +71,15 @@ export const radii = {
 } as const;
 
 export const shadow = {
+  // No elevation — for list-row containers (a Card wrapping a list of rows)
+  // that shouldn't visually compete with metric/hero cards. Border-only.
+  flat: {
+    shadowColor: "transparent",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
+  },
   // Default card elevation — used everywhere today.
   card: {
     shadowColor: "#1C114A",

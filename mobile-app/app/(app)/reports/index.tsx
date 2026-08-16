@@ -1,4 +1,5 @@
-import { FlatList, View } from "react-native";
+import { useState } from "react";
+import { FlatList, RefreshControl, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FileText } from "lucide-react-native";
 import { AppHeader } from "../../../components/layout/AppHeader";
@@ -15,13 +16,20 @@ export default function ReportsScreen() {
   const selected = useFactoryStore((s) => s.selected);
   const isMockMode = useFactoryStore((s) => s.isMockMode);
   const { data, isLoading, isError, refetch } = useReports(selected?.id ?? null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
       <AppHeader title="Reports" subtitle={data ? `${data.length} report${data.length === 1 ? "" : "s"}` : undefined} />
       <FactorySelector />
       {isMockMode && data && data.length > 0 ? (
-        <View className="px-5 mb-3">
+        <View className="px-5 pb-3">
           <DemoBadge />
         </View>
       ) : null}
@@ -43,7 +51,8 @@ export default function ReportsScreen() {
         <FlatList
           data={[...data].sort((a, b) => b.createdAt.localeCompare(a.createdAt))}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 24, gap: 12 }}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 32, gap: 12 }}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           renderItem={({ item }) => <ReportCard report={item} />}
         />
       )}

@@ -10,6 +10,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -40,9 +41,18 @@ public class Report {
     @Column(name = "safety_score", nullable = false)
     private Integer safetyScore;
 
+    /** Audit template name, e.g. "PPE Compliance Audit" — set by the (mock or real) AI result. */
+    @Column(name = "title")
+    private String title;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "summary_json")
     private Map<String, Integer> summaryJson;
+
+    /** Human-readable follow-up actions surfaced alongside the violation list. */
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "recommendations")
+    private List<String> recommendations;
 
     @Column(name = "pdf_key")
     private String pdfKey;

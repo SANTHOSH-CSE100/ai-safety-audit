@@ -9,6 +9,41 @@ function summarize(violations: ViolationResponse[]): Record<string, number> {
   return summary;
 }
 
+/** Mirrors the backend's four mock-analysis audit templates (see MockAiAnalysisService) so demo reports read the same way as backend-generated ones. */
+function titleFor(violations: ViolationResponse[]): string {
+  if (violations.length === 0) return "General Factory Safety Audit";
+  const types = new Set(violations.map((v) => v.type));
+  if (types.has("FORKLIFT_PROXIMITY") || types.has("UNAUTHORIZED_ZONE_ENTRY") || types.has("BLOCKED_FIRE_EXIT")) {
+    return "Restricted Zone Audit";
+  }
+  if (types.has("NO_HELMET") || types.has("MISSING_GLOVES") || types.has("NO_SAFETY_VEST")) {
+    return "PPE Compliance Audit";
+  }
+  if (types.has("UNSAFE_LADDER_USE") || types.has("MISSING_GUARD_RAIL")) {
+    return "Machinery Safety Audit";
+  }
+  return "General Factory Safety Audit";
+}
+
+const RECOMMENDATION_BY_TYPE: Record<string, string> = {
+  NO_HELMET: "Provide refresher training on mandatory PPE before floor access.",
+  NO_SAFETY_VEST: "Reinforce high-visibility vest requirements at shift start.",
+  MISSING_GLOVES: "Restock glove dispensers near high-traffic zones.",
+  NO_EAR_PROTECTION: "Enforce hearing protection in high-noise zones.",
+  UNAUTHORIZED_ZONE_ENTRY: "Install physical barriers around restricted-zone entry points.",
+  FORKLIFT_PROXIMITY: "Add proximity sensors with audible alerts near forklifts.",
+  BLOCKED_FIRE_EXIT: "Keep fire exits clear at all times — schedule daily checks.",
+  UNSAFE_LADDER_USE: "Retrain staff on ladder safety and inspection procedures.",
+  MISSING_GUARD_RAIL: "Install guard rails at all elevated work platforms.",
+  SPILL_NOT_CONTAINED: "Deploy spill-response kits at material handling bays.",
+};
+
+function recommendationsFor(violations: ViolationResponse[]): string[] {
+  const recs = violations.map((v) => RECOMMENDATION_BY_TYPE[v.type]).filter((r): r is string => !!r);
+  const unique = Array.from(new Set(recs));
+  return unique.length > 0 ? unique : ["No corrective action required — maintain current safety practices."];
+}
+
 function report(
   id: string,
   uploadId: string,
@@ -19,10 +54,12 @@ function report(
   return {
     id,
     uploadId,
+    title: titleFor(violations),
     safetyScore,
     riskScore: Math.max(0, 100 - safetyScore),
     summary: summarize(violations),
     violations,
+    recommendations: recommendationsFor(violations),
     createdAt,
   };
 }

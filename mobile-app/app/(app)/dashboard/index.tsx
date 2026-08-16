@@ -34,7 +34,7 @@ export default function DashboardScreen() {
 
   const firstName = fullName?.split(" ")[0];
 
-  if (factoriesQuery.isSuccess && factoriesQuery.data.length === 0 && !isMockMode) {
+  if (factoriesQuery.isSuccess && factoriesQuery.data && factoriesQuery.data.length === 0 && !isMockMode) {
     return (
       <ScreenContainer scroll={false}>
         <AppHeader title={firstName ? `Hi, ${firstName}` : "Dashboard"} subtitle="Here's your safety overview" />

@@ -24,9 +24,14 @@ export function ReportCard({ report }: { report: ReportDetailResponse }) {
           <Text style={{ color, fontWeight: "800", fontSize: 18 }}>{report.safetyScore}</Text>
         </View>
         <View className="flex-1 gap-1.5">
+          {report.title ? (
+            <Text className={typography.cardTitle} numberOfLines={1}>
+              {report.title}
+            </Text>
+          ) : null}
           <View className="flex-row items-center gap-1.5">
             <ShieldAlert size={13} color={colors.muted} />
-            <Text className={typography.cardTitle}>
+            <Text className={report.title ? typography.caption : typography.cardTitle}>
               {report.violations.length} violation{report.violations.length === 1 ? "" : "s"}
             </Text>
           </View>

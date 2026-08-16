@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, RefreshControl, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Pressable } from "react-native";
 import { router } from "expo-router";
@@ -20,6 +20,13 @@ export default function FactoriesScreen() {
   const { data, isLoading, isError, refetch } = useFactories();
   const isMockMode = useFactoryStore((s) => s.isMockMode);
   const [query, setQuery] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
 
   const filtered = useMemo(() => {
     if (!data) return [];
@@ -56,7 +63,8 @@ export default function FactoriesScreen() {
         <FlatList
           data={filtered}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 24, gap: 12 }}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 32, gap: 12 }}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           renderItem={({ item }) => <FactoryCard factory={item} />}
         />
       )}

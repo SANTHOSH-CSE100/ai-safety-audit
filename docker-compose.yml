@@ -67,6 +67,11 @@ services:
       MINIO_SECRET_KEY: minioadmin
       MINIO_BUCKET: ai-safety-audit
       AI_SERVICE_URL: http://ai-service:8000
+      # Demo mode: mock analysis is generated in-process, so the AI service
+      # below is optional — `docker compose up -d postgres redis minio` plus
+      # the backend is a complete upload -> report flow on its own. Set to
+      # "false" once a real AI service should be used instead.
+      AI_SERVICE_MOCK_ENABLED: "true"
       JWT_SECRET: change-this-in-production-to-a-long-random-secret
     ports:
       - "8080:8080"
@@ -75,8 +80,9 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-      ai-service:
-        condition: service_started
+      # Intentionally NOT depending on ai-service — it's optional (see
+      # AI_SERVICE_MOCK_ENABLED above). `docker compose up -d backend` (or
+      # the full stack) will no longer force ai-service to start first.
 
   nginx:
     image: nginx:alpine

@@ -32,10 +32,13 @@ export interface ViolationResponse {
 export interface ReportDetailResponse {
   id: string;
   uploadId: string;
+  /** Audit template name, e.g. "PPE Compliance Audit" — absent on older reports created before this field existed. */
+  title?: string | null;
   riskScore: number;
   safetyScore: number;
   summary: Record<string, number>;
   violations: ViolationResponse[];
+  recommendations?: string[];
   createdAt: string;
 }
 

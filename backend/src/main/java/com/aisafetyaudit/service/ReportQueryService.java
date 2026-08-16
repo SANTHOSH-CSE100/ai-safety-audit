@@ -44,7 +44,7 @@ public class ReportQueryService {
                 .toList();
 
         return new ReportDetailResponse(
-                r.getId(), r.getUpload().getId(), r.getRiskScore(), r.getSafetyScore(),
-                r.getSummaryJson(), violationDtos, r.getCreatedAt());
+                r.getId(), r.getUpload().getId(), r.getTitle(), r.getRiskScore(), r.getSafetyScore(),
+                r.getSummaryJson(), violationDtos, r.getRecommendations(), r.getCreatedAt());
     }
 }

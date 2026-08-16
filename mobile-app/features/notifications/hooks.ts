@@ -10,18 +10,27 @@ import { DEMO_FALLBACK_ENABLED, isMockId, mockNotifications } from "../../src/mo
 /**
  * Notifications aren't factory-scoped, so unlike analytics/reports/uploads
  * this always calls the real endpoint — it only swaps the *result* for the
- * demo set when the real backend genuinely has nothing yet.
+ * demo set when the real backend genuinely has nothing yet, OR when the call
+ * fails outright (backend unreachable). `select` only runs on success, so
+ * the error case is handled separately below rather than via `select`.
  */
 export function useNotifications() {
-  return useQuery({
+  const query = useQuery({
     queryKey: queryKeys.notifications,
     queryFn: listNotifications,
     select: (data) => (data.length === 0 && DEMO_FALLBACK_ENABLED ? mockNotifications : data),
   });
+
+  const usingMockFallback = DEMO_FALLBACK_ENABLED && query.isError;
+  return {
+    ...query,
+    data: usingMockFallback ? mockNotifications : query.data,
+    isError: usingMockFallback ? false : query.isError,
+  };
 }
 
 export function useUnreadCount() {
-  return useQuery({
+  const query = useQuery({
     queryKey: queryKeys.unreadCount,
     queryFn: getUnreadCount,
     refetchInterval: 30_000,
@@ -30,6 +39,13 @@ export function useUnreadCount() {
         ? { count: mockNotifications.filter((n) => !n.read).length }
         : data,
   });
+
+  const usingMockFallback = DEMO_FALLBACK_ENABLED && query.isError;
+  return {
+    ...query,
+    data: usingMockFallback ? { count: mockNotifications.filter((n) => !n.read).length } : query.data,
+    isError: usingMockFallback ? false : query.isError,
+  };
 }
 
 export function useMarkRead() {

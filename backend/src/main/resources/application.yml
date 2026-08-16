@@ -39,6 +39,11 @@ app:
 
   ai-service:
     base-url: ${AI_SERVICE_URL:http://localhost:8000}
+    # Demo mode (default): generate a realistic mock safety analysis instead
+    # of calling the AI service, so upload -> report works standalone with
+    # just postgres/redis/minio running. Set to false once a real AI service
+    # is wired up and should be used instead.
+    mock-enabled: ${AI_SERVICE_MOCK_ENABLED:true}
 
   storage:
     minio:

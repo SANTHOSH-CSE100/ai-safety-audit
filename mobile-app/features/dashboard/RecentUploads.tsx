@@ -27,7 +27,7 @@ export function RecentUploads({ uploads, isDemo }: { uploads: UploadResponse[]; 
           </View>
         }
       />
-      <Card padded={false}>
+      <Card padded={false} elevation="flat">
         {recent.map((upload, i) => (
           <UploadCard
             key={upload.id}
